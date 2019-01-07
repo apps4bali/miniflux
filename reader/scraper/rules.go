@@ -39,4 +39,9 @@ var predefinedRules = map[string]string{
 	"wired.com":           "main figure, article",
 	"zeit.de":             ".summary, .article-body",
 	"zdnet.com":           "div.storyBody",
+
+	// Bali News
+	"balipost.com":				 "div.td-post-content",
+	"nusabali.com": 			 ".entry-box .entry-content",
+	"metrobali.com":			 "figure.wp-single-image, .entry-content-inner",
 }
