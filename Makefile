@@ -3,7 +3,8 @@ VERSION := $(shell git rev-parse --short HEAD)
 BUILD_DATE := `date +%FT%T%z`
 LD_FLAGS := "-s -w -X 'miniflux.app/version.Version=$(VERSION)' -X 'miniflux.app/version.BuildDate=$(BUILD_DATE)'"
 PKG_LIST := $(shell go list ./... | grep -v /vendor/)
-DB_URL := postgres://postgres:postgres@localhost/miniflux_test?sslmode=disable
+DEV_DB_URL := postgres://postgres:postgres@localhost/miniflux2?sslmode=disable
+TEST_DB_URL := postgres://postgres:postgres@localhost/miniflux_test?sslmode=disable
 
 export GO111MODULE=on
 
@@ -96,13 +97,19 @@ test:
 lint:
 	@ golint -set_exit_status ${PKG_LIST}
 
+run-migration:
+	DATABASE_URL=$(DEV_DB_URL) go run -mod=vendor main.go -migrate
+
+create-admin:
+	DATABASE_URL=$(DEV_DB_URL) ADMIN_USERNAME=admin ADMIN_PASSWORD=password go run -mod=vendor main.go -create-admin
+
 integration-test:
 	psql -U postgres -c 'drop database if exists miniflux_test;'
 	psql -U postgres -c 'create database miniflux_test;'
-	DATABASE_URL=$(DB_URL) go run -mod=vendor main.go -migrate
-	DATABASE_URL=$(DB_URL) ADMIN_USERNAME=admin ADMIN_PASSWORD=test123 go run -mod=vendor main.go -create-admin
+	DATABASE_URL=$(TEST_DB_URL) go run -mod=vendor main.go -migrate
+	DATABASE_URL=$(TEST_DB_URL) ADMIN_USERNAME=admin ADMIN_PASSWORD=test123 go run -mod=vendor main.go -create-admin
 	go build -mod=vendor -o miniflux-test main.go
-	DATABASE_URL=$(DB_URL) ./miniflux-test -debug >/tmp/miniflux.log 2>&1 & echo "$$!" > "/tmp/miniflux.pid"
+	DATABASE_URL=$(TEST_DB_URL) ./miniflux-test -debug >/tmp/miniflux.log 2>&1 & echo "$$!" > "/tmp/miniflux.pid"
 	while ! echo exit | nc localhost 8080; do sleep 1; done >/dev/null
 	go test -mod=vendor -v -tags=integration -count=1 miniflux.app/tests || cat /tmp/miniflux.log
 
