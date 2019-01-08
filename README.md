@@ -1,5 +1,9 @@
 Miniflux 2
 ==========
+
+NOTE: Gatra Bali use Miniflux 2 as the core part of the project, Miniflux aggregates news from several Balinese online media.
+
+
 [![Build Status](https://travis-ci.org/miniflux/miniflux.svg?branch=master)](https://travis-ci.org/miniflux/miniflux)
 [![GoDoc](https://godoc.org/miniflux.app?status.svg)](https://godoc.org/miniflux.app)
 [![Documentation Status](https://readthedocs.org/projects/miniflux/badge/?version=latest)](https://docs.miniflux.app/)
