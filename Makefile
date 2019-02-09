@@ -7,6 +7,7 @@ DEV_DB_URL := postgres://postgres:postgres@localhost/miniflux2?sslmode=disable
 TEST_DB_URL := postgres://postgres:postgres@localhost/miniflux_test?sslmode=disable
 
 export GO111MODULE=on
+export GOOGLE_APPLICATION_CREDENTIALS=../miniflux-backend.json
 
 .PHONY: generate
 .PHONY: miniflux

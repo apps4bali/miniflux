@@ -33,6 +33,8 @@ const (
 	defaultOAuth2ClientSecret = ""
 	defaultOAuth2RedirectURL  = ""
 	defaultOAuth2Provider     = ""
+	defaultGcpProjectID       = "gatrabali"
+	defaultGcpPubsubTopic     = "SyncData"
 )
 
 // Config manages configuration parameters.
@@ -228,6 +230,16 @@ func (c *Config) HasSchedulerService() bool {
 // ArchiveReadDays returns the number of days after which marking read items as removed.
 func (c *Config) ArchiveReadDays() int {
 	return getIntValue("ARCHIVE_READ_DAYS", defaultArchiveReadDays)
+}
+
+// GcpProjectID return GCP Project ID this backend will belongs to, default "gatrabali"
+func (c *Config) GcpProjectID() string {
+	return getStringValue("GCP_PROJECT_ID", defaultGcpProjectID)
+}
+
+// GcpPubsubTopic return GCP Pubsub Topic, default "SyncData"
+func (c *Config) GcpPubsubTopic() string {
+	return getStringValue("GCP_PUBSUB_TOPIC", defaultGcpPubsubTopic)
 }
 
 // NewConfig returns a new Config.
