@@ -60,6 +60,10 @@ func (s *Storage) UpdateEntryContent(entry *model.Entry) error {
 		return fmt.Errorf(`unable to update content of entry #%d: %v`, entry.ID, err)
 	}
 
+	// Sync entry
+	syncEvent := gcppubsub.NewEntryEvent(entry.ID, gcppubsub.EntityOpWrite)
+	s.pub.PublishEvent(syncEvent)
+
 	return tx.Commit()
 }
 
