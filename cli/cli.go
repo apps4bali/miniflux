@@ -13,6 +13,7 @@ import (
 	"miniflux.app/logger"
 	"miniflux.app/storage"
 	"miniflux.app/version"
+	"miniflux.app/integration/gcppubsub"
 )
 
 const (
@@ -79,6 +80,10 @@ func Parse() {
 	}
 
 	store := storage.NewStorage(db)
+
+	// Add pubsub publisher to 'storage' instance so we can call the Publish method on every 'storage' methods.
+	publisher := gcppubsub.NewPublisher(cfg)
+	store.AddPubsubPublisher(publisher)
 
 	if flagResetFeedErrors {
 		store.ResetFeedErrors()
