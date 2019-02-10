@@ -5,8 +5,10 @@ import (
 	"log"
 	"context"
 	"encoding/json"
+	"time"
 
 	"miniflux.app/config"
+	"miniflux.app/timer"
 	"cloud.google.com/go/pubsub"
 )
 
@@ -22,20 +24,21 @@ func NewPublisher(config *config.Config) (publisher *Publisher) {
 	ctx := context.Background()
 	client, err := pubsub.NewClient(ctx, config.GcpProjectID())
 	if err != nil {
-		log.Fatalf("Failed top create Google PubSub client: %v", err)
+		log.Fatalf("[gcppubsub:NewPublisher] Failed top create Google PubSub client: %v", err)
 	}
 
 	topic := client.Topic(config.GcpPubsubTopic())
 	return &Publisher{ctx, client, topic}
 }
 
-// Publish call pubsub client publish method
-func (p *Publisher) Publish(event SyncEvent) {
+// PublishEvent publish an event to PubSub
+func (p *Publisher) PublishEvent(event SyncEvent) {
 	jsonEvent, err := json.Marshal(event)
 	if(err != nil){
-		fmt.Printf("Unable to marshal %v to JSON, %v\n", event, err)
+		fmt.Printf("[Publisher:PublishEvent] Unable to marshal %v to JSON, %v\n", event, err)
 		return
 	}
 	msg := &pubsub.Message{Data: []byte(jsonEvent)}
+	timer.ExecutionTime(time.Now(), fmt.Sprintf("[Publisher:PublishEvent] Publishing %v", event))
 	p.topic.Publish(p.ctx, msg)
 }

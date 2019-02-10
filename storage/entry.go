@@ -12,6 +12,7 @@ import (
 	"miniflux.app/logger"
 	"miniflux.app/model"
 	"miniflux.app/timer"
+	"miniflux.app/integration/gcppubsub"
 
 	"github.com/lib/pq"
 )
@@ -97,6 +98,10 @@ func (s *Storage) createEntry(entry *model.Entry) error {
 		}
 	}
 
+	// Sync entry
+	syncEvent := gcppubsub.NewEntryEvent(entry.ID, gcppubsub.EntityOpWrite)
+	s.pub.PublishEvent(syncEvent)
+
 	return nil
 }
 
@@ -131,6 +136,10 @@ func (s *Storage) updateEntry(entry *model.Entry) error {
 		enclosure.UserID = entry.UserID
 		enclosure.EntryID = entry.ID
 	}
+
+	// Sync entry
+	syncEvent := gcppubsub.NewEntryEvent(entry.ID, gcppubsub.EntityOpWrite)
+	s.pub.PublishEvent(syncEvent)
 
 	return s.UpdateEnclosures(entry.Enclosures)
 }

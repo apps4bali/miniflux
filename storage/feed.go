@@ -13,6 +13,7 @@ import (
 	"miniflux.app/model"
 	"miniflux.app/timer"
 	"miniflux.app/timezone"
+	"miniflux.app/integration/gcppubsub"
 )
 
 // FeedExists checks if the given feed exists.
@@ -219,6 +220,10 @@ func (s *Storage) CreateFeed(feed *model.Feed) error {
 		return fmt.Errorf("unable to create feed %q: %v", feed.FeedURL, err)
 	}
 
+	// Sync feed
+	syncEvent := gcppubsub.NewFeedEvent(feed.ID, gcppubsub.EntityOpWrite)
+	s.pub.PublishEvent(syncEvent)
+
 	for i := 0; i < len(feed.Entries); i++ {
 		feed.Entries[i].FeedID = feed.ID
 		feed.Entries[i].UserID = feed.UserID
@@ -264,6 +269,10 @@ func (s *Storage) UpdateFeed(feed *model.Feed) (err error) {
 	if err != nil {
 		return fmt.Errorf("unable to update feed #%d (%s): %v", feed.ID, feed.FeedURL, err)
 	}
+
+	// Sync feed
+	syncEvent := gcppubsub.NewFeedEvent(feed.ID, gcppubsub.EntityOpWrite)
+	s.pub.PublishEvent(syncEvent)
 
 	return nil
 }
@@ -312,6 +321,10 @@ func (s *Storage) RemoveFeed(userID, feedID int64) error {
 	if count == 0 {
 		return errors.New("no feed has been removed")
 	}
+
+	// Sync feed
+	syncEvent := gcppubsub.NewFeedEvent(feedID, gcppubsub.EntityOpDelete)
+	s.pub.PublishEvent(syncEvent)
 
 	return nil
 }

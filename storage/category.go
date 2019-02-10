@@ -12,6 +12,7 @@ import (
 
 	"miniflux.app/model"
 	"miniflux.app/timer"
+	"miniflux.app/integration/gcppubsub"
 )
 
 // AnotherCategoryExists checks if another category exists with the same title.
@@ -155,6 +156,10 @@ func (s *Storage) CreateCategory(category *model.Category) error {
 		return fmt.Errorf("Unable to create category: %v", err)
 	}
 
+	// Sync category
+	syncEvent := gcppubsub.NewCategoryEvent(category.ID, gcppubsub.EntityOpWrite)
+	s.pub.PublishEvent(syncEvent)
+
 	return nil
 }
 
@@ -173,6 +178,10 @@ func (s *Storage) UpdateCategory(category *model.Category) error {
 	if err != nil {
 		return fmt.Errorf("Unable to update category: %v", err)
 	}
+
+	// Sync category
+	syncEvent := gcppubsub.NewCategoryEvent(category.ID, gcppubsub.EntityOpWrite)
+	s.pub.PublishEvent(syncEvent)
 
 	return nil
 }
@@ -194,6 +203,10 @@ func (s *Storage) RemoveCategory(userID, categoryID int64) error {
 	if count == 0 {
 		return errors.New("no category has been removed")
 	}
+
+	// Sync category
+	syncEvent := gcppubsub.NewCategoryEvent(categoryID, gcppubsub.EntityOpDelete)
+	s.pub.PublishEvent(syncEvent)
 
 	return nil
 }
