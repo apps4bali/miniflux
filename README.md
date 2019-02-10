@@ -1,7 +1,10 @@
 Miniflux 2
 ==========
 
-NOTE: Gatra Bali use Miniflux 2 as the core part of the project, Miniflux aggregates news from several Balinese online media.
+NOTE:
+Gatra Bali project uses Miniflux 2 as the core part of the system, Miniflux aggregates news from several Balinese online media. I added Google Cloud Platform PubSub integration to publish a message to a Topic every time Category, Feed and Entry is created/updated/deleted. Every message sent to that topic will be received by the Cloud Functions (please check [gatrabali-functions](https://github.com/apps4bali/gatrabali-functions)) then based on the message the Cloud Function will call Miniflux REST API and process/store the response to Firestore.
+
+Then the mobile app just need to use Firebase SDK to pull the news and all other features (read later, sharing, auth, comments, etc.) will be implemented on the Firebase side.
 
 
 [![Build Status](https://travis-ci.org/miniflux/miniflux.svg?branch=master)](https://travis-ci.org/miniflux/miniflux)
