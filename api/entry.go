@@ -191,6 +191,37 @@ func (h *handler) toggleBookmark(w http.ResponseWriter, r *http.Request) {
 	json.NoContent(w, r)
 }
 
+func (h *handler) getEntryEnclosures(w http.ResponseWriter, r *http.Request) {
+	entryID := request.RouteInt64Param(r, "entryID")
+	builder := h.store.NewEntryQueryBuilder(request.UserID(r))
+	builder.WithEntryID(entryID)
+
+	entry, err := builder.GetEntry()
+	if err != nil {
+		json.ServerError(w, r, err)
+		return
+	}
+
+	if entry == nil {
+		json.NotFound(w, r)
+		return
+	}
+
+	// get entry enclosures
+	enclosures, err := h.store.GetEnclosures(entryID)
+	if err != nil {
+		json.ServerError(w, r, err)
+		return
+	}
+
+	if len(enclosures) == 0 {
+		json.NotFound(w, r)
+		return
+	}
+
+	json.OK(w, r, enclosures)
+}
+
 func configureFilters(builder *storage.EntryQueryBuilder, r *http.Request) {
 	beforeEntryID := request.QueryInt64Param(r, "before_entry_id", 0)
 	if beforeEntryID != 0 {

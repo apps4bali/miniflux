@@ -43,5 +43,6 @@ func Serve(router *mux.Router, store *storage.Storage, feedHandler *feed.Handler
 	sr.HandleFunc("/entries", handler.getEntries).Methods("GET")
 	sr.HandleFunc("/entries", handler.setEntryStatus).Methods("PUT")
 	sr.HandleFunc("/entries/{entryID}", handler.getEntry).Methods("GET")
+	sr.HandleFunc("/entries/{entryID}/enclosures", handler.getEntryEnclosures).Methods("GET")
 	sr.HandleFunc("/entries/{entryID}/bookmark", handler.toggleBookmark).Methods("PUT")
 }
