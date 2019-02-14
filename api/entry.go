@@ -207,7 +207,6 @@ func (h *handler) getEntryEnclosures(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// get entry enclosures
 	enclosures, err := h.store.GetEnclosures(entryID)
 	if err != nil {
 		json.ServerError(w, r, err)
