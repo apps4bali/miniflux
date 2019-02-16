@@ -29,4 +29,5 @@ var predefinedRules = map[string]string{
 	"xkcd.com":               "add_image_title",
 	// Bali News Websites
 	"balipost.com":           "hide_first_image",
+	"metrobali.com":          "hide_first_image",
 }
