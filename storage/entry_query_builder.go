@@ -181,6 +181,13 @@ func (e *EntryQueryBuilder) GetEntry() (*model.Entry, error) {
 	if err != nil {
 		return nil, err
 	}
+	// if enclosures not presents in DB, try to get it from the content.
+	if len(entries[0].Enclosures) == 0 {
+		contentEnclosures := entries[0].GetEnclosuresFromContent()
+		if len(contentEnclosures) > 0 {
+			entries[0].Enclosures = contentEnclosures
+		}
+	}
 
 	return entries[0], nil
 }

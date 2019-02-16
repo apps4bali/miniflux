@@ -7,6 +7,9 @@ package model // import "miniflux.app/model"
 import (
 	"fmt"
 	"time"
+	"strings"
+
+	"github.com/PuerkitoBio/goquery"
 )
 
 // Entry statuses
@@ -39,6 +42,31 @@ type Entry struct {
 
 // Entries represents a list of entries.
 type Entries []*Entry
+
+
+// GetEnclosuresFromContent returns EnclosureList by finding specific tag on entry content
+// and convert them into Enclosure object.
+// But this enclosure doesn't actually exists on DB, for client side use only.
+func (e Entry) GetEnclosuresFromContent() EnclosureList {
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader(e.Content))
+	if err != nil {
+		return nil
+	}
+	spans := doc.Find("span[data-miniflux-enclosure]")
+	list := make(EnclosureList, 0)
+
+	if spans.Length() > 0 {
+		spans.Each(func(i int, span *goquery.Selection) {
+			list = append(list, &Enclosure{
+					URL: span.AttrOr("data-miniflux-enclosure", ""),
+					MimeType: "image/jpg",
+					Size: 0,
+				})
+		})
+	}
+
+	return list
+}
 
 // ValidateEntryStatus makes sure the entry status is valid.
 func ValidateEntryStatus(status string) error {

@@ -321,6 +321,7 @@ func isValidIframeSource(src string) bool {
 
 func getTagWhitelist() map[string][]string {
 	whitelist := make(map[string][]string)
+	whitelist["span"] = []string{"data-miniflux-enclosure"}
 	whitelist["img"] = []string{"alt", "title", "src"}
 	whitelist["audio"] = []string{"src"}
 	whitelist["video"] = []string{"poster", "height", "width", "src"}
@@ -367,7 +368,6 @@ func getTagWhitelist() map[string][]string {
 	whitelist["var"] = []string{}
 	whitelist["samp"] = []string{}
 	whitelist["s"] = []string{}
-	whitelist["del"] = []string{}
 	whitelist["ins"] = []string{}
 	whitelist["kbd"] = []string{}
 	whitelist["rp"] = []string{}

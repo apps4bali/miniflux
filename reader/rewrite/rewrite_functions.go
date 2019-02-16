@@ -18,6 +18,29 @@ var (
 	textLinkRegex = regexp.MustCompile(`(?mi)(\bhttps?:\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])`)
 )
 
+// hideFirstImage replaces the first image found on body with span tag '<span data-minifux-enclosure=""/>'
+// Before the content displayed, we can use the 'data-minifux-enclosure' value as an enclosure object
+func hideFirstImage(entryURL, entryContent string) string {
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader(entryContent))
+	if err != nil {
+		return entryContent
+	}
+
+	matches := doc.Find("img")
+
+	if matches.Length() > 0 {
+		// we only need to hide the first image
+		img := matches.First()
+		srcAttr, _ := img.Attr("src")
+		img.ReplaceWithHtml(`<span data-miniflux-enclosure="`+ srcAttr +`"/>`)
+
+		output, _ := doc.Find("body").First().Html() // the whole output
+		return output
+	}
+
+	return entryContent
+}
+
 func addImageTitle(entryURL, entryContent string) string {
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(entryContent))
 	if err != nil {

@@ -40,7 +40,7 @@ var predefinedRules = map[string]string{
 	"zeit.de":             ".summary, .article-body",
 	"zdnet.com":           "div.storyBody",
 
-	// Bali News
+	// Bali News Websites
 	"balipost.com":				 "div.td-post-content",
 	"nusabali.com": 			 ".entry-box .entry-content",
 	"metrobali.com":			 "figure.wp-single-image, .entry-content-inner",
