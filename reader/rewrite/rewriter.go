@@ -35,6 +35,10 @@ func Rewriter(entryURL, entryContent, customRewriteRules string) string {
 			entryContent = addPDFLink(entryURL, entryContent)
 		case "hide_first_image":
 			entryContent = hideFirstImage(entryURL, entryContent)
+		case "cleanup_balipost":
+			entryContent = cleanupBaliPost(entryURL, entryContent)
+		case "cleanup_metrobali":
+			entryContent = cleanupMetroBali(entryURL, entryContent)
 		}
 	}
 

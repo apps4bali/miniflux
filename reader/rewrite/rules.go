@@ -28,6 +28,6 @@ var predefinedRules = map[string]string{
 	"youtube.com":            "add_youtube_video",
 	"xkcd.com":               "add_image_title",
 	// Bali News Websites
-	"balipost.com":           "hide_first_image",
-	"metrobali.com":          "hide_first_image",
+	"balipost.com":           "hide_first_image,cleanup_balipost",
+	"metrobali.com":          "hide_first_image,cleanup_metrobali",
 }

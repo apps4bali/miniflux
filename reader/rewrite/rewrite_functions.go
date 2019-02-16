@@ -18,29 +18,6 @@ var (
 	textLinkRegex = regexp.MustCompile(`(?mi)(\bhttps?:\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])`)
 )
 
-// hideFirstImage replaces the first image found on body with span tag '<span data-minifux-enclosure=""/>'
-// Before the content displayed, we can use the 'data-minifux-enclosure' value as an enclosure object
-func hideFirstImage(entryURL, entryContent string) string {
-	doc, err := goquery.NewDocumentFromReader(strings.NewReader(entryContent))
-	if err != nil {
-		return entryContent
-	}
-
-	matches := doc.Find("img")
-
-	if matches.Length() > 0 {
-		// we only need to hide the first image
-		img := matches.First()
-		srcAttr, _ := img.Attr("src")
-		img.ReplaceWithHtml(`<span data-miniflux-enclosure="`+ srcAttr +`"/>`)
-
-		output, _ := doc.Find("body").First().Html() // the whole output
-		return output
-	}
-
-	return entryContent
-}
-
 func addImageTitle(entryURL, entryContent string) string {
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(entryContent))
 	if err != nil {
@@ -150,4 +127,103 @@ func replaceTextLinks(input string) string {
 
 func replaceLineFeeds(input string) string {
 	return strings.Replace(input, "\n", "<br>", -1)
+}
+
+// -- Gatra Bali specific rewriter functions -- //
+
+// hideFirstImage replaces the first image found on body with span tag '<span data-minifux-enclosure=""/>'
+// Before the content displayed, we can use the 'data-minifux-enclosure' value as an enclosure object
+func hideFirstImage(entryURL, entryContent string) string {
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader(entryContent))
+	if err != nil {
+		return entryContent
+	}
+
+	matches := doc.Find("img")
+
+	if matches.Length() > 0 {
+		// we only need to hide the first image
+		img := matches.First()
+		srcAttr, _ := img.Attr("src")
+		img.ReplaceWithHtml(`<span data-miniflux-enclosure="`+ srcAttr +`"/>`)
+
+		output, _ := doc.Find("body").First().Html() // the whole output
+		return output
+	}
+
+	return entryContent
+}
+
+func cleanupBacaJuga(s *goquery.Selection) bool {
+	text := strings.ToLower(s.Text())
+	if strings.Contains(text, "baca juga") {
+		s.Parent().Remove()
+		return true
+	}
+	return false
+}
+
+func cleanupBaliPost(entryURL, entryContent string) string {
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader(entryContent))
+	if err != nil {
+		return entryContent
+	}
+
+	changed := false
+
+	// Remove 'Baca Juga' Links
+	bacaJuga := doc.Find("span")
+	bacaJuga.Each(func(i int, bj *goquery.Selection) {
+		removed := cleanupBacaJuga(bj)
+		if removed {
+			changed = true
+		}
+	})
+	
+	if changed {
+		output, _ := doc.Find("body").First().Html()
+		return output
+	}
+	return entryContent
+}
+
+func cleanupMetroBali(entryURL, entryContent string) string {
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader(entryContent))
+	if err != nil {
+		return entryContent
+	}
+
+	changed := false
+
+	// Remove 'Baca Juga' Links
+	bacaJuga := doc.Find("span")
+	bacaJuga.Each(func(i int, bj *goquery.Selection) {
+		removed := cleanupBacaJuga(bj)
+		if removed {
+			changed = true
+		}
+	})
+	
+	// Remove Related Posts
+	relatedPostSectionHeader := doc.Find("h3")
+	relatedPostSectionHeader.Each(func(i int, h3 *goquery.Selection) {
+		if h3.Text() == "Related Posts" {
+
+			// remove all elements after '<h3>Related Posts</h3>' 
+			nexts := h3.NextAll()
+			nexts.Each(func(i int, next *goquery.Selection) {
+				next.Remove()
+			})
+
+			// remove the h3 itself
+			h3.Remove()
+			changed = true
+		}
+	})
+
+	if changed {
+		output, _ := doc.Find("body").First().Html()
+		return output
+	}
+	return entryContent
 }
