@@ -57,9 +57,12 @@ func (e Entry) GetEnclosuresFromContent() EnclosureList {
 
 	if spans.Length() > 0 {
 		spans.Each(func(i int, span *goquery.Selection) {
+			url, _ := span.Attr("data-miniflux-enclosure")
+			tokens := strings.Split(url, ".")
+			extension := tokens[len(tokens)-1]
 			list = append(list, &Enclosure{
-					URL: span.AttrOr("data-miniflux-enclosure", ""),
-					MimeType: "image/jpg",
+					URL: url,
+					MimeType: "image/" + strings.ToLower(extension),
 					Size: 0,
 				})
 		})
