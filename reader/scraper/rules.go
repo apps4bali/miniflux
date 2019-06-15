@@ -44,4 +44,5 @@ var predefinedRules = map[string]string{
 	"balipost.com":				 "div.td-post-content",
 	"nusabali.com": 			 ".entry-box .entry-content",
 	"metrobali.com":			 "figure.wp-single-image, .entry-content-inner",
+	"balipuspanews.com":		 ".td-post-featured-image img, .td-post-content",
 }

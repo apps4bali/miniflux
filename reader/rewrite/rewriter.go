@@ -39,6 +39,8 @@ func Rewriter(entryURL, entryContent, customRewriteRules string) string {
 			entryContent = cleanupBaliPost(entryURL, entryContent)
 		case "cleanup_metrobali":
 			entryContent = cleanupMetroBali(entryURL, entryContent)
+		case "cleanup_balipuspanews":
+			entryContent = cleanupBaliPuspaNews(entryURL, entryContent)
 		}
 	}
 

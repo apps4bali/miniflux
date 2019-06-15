@@ -30,4 +30,5 @@ var predefinedRules = map[string]string{
 	// Bali News Websites
 	"balipost.com":           "hide_first_image,cleanup_balipost",
 	"metrobali.com":          "hide_first_image,cleanup_metrobali",
+	"balipuspanews.com":      "hide_first_image,cleanup_balipuspanews",
 }

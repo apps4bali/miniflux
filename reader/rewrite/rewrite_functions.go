@@ -155,6 +155,13 @@ func hideFirstImage(entryURL, entryContent string) string {
 }
 
 func cleanupBacaJuga(s *goquery.Selection) bool {
+	// if element has class 'IRRP_kangoo'
+	if s.HasClass("IRRP_kangoo") {
+		s.Remove()
+		return true
+	}
+
+	// If text contains 'baca juga'
 	text := strings.ToLower(s.Text())
 	if strings.Contains(text, "baca juga") {
 		s.Parent().Remove()
@@ -196,7 +203,7 @@ func cleanupMetroBali(entryURL, entryContent string) string {
 	changed := false
 
 	// Remove 'Baca Juga' Links
-	bacaJuga := doc.Find("span")
+	bacaJuga := doc.Find("a")
 	bacaJuga.Each(func(i int, bj *goquery.Selection) {
 		removed := cleanupBacaJuga(bj)
 		if removed {
@@ -221,6 +228,28 @@ func cleanupMetroBali(entryURL, entryContent string) string {
 		}
 	})
 
+	if changed {
+		output, _ := doc.Find("body").First().Html()
+		return output
+	}
+	return entryContent
+}
+
+func cleanupBaliPuspaNews(entryURL, entryContent string) string {
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader(entryContent))
+	if err != nil {
+		return entryContent
+	}
+
+	changed := false
+
+	// Remove Ads
+	ads := doc.Find(".td-all-devices")
+	ads.Each(func(i int, ad *goquery.Selection) {
+		ad.Remove()
+		changed = true
+	})
+	
 	if changed {
 		output, _ := doc.Find("body").First().Html()
 		return output
