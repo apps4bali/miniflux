@@ -15,6 +15,7 @@ import (
 	"miniflux.app/integration/gcppubsub"
 
 	"github.com/lib/pq"
+	"github.com/abadojack/whatlanggo"
 )
 
 // CountUnreadEntries returns the number of unread entries.
@@ -103,9 +104,22 @@ func (s *Storage) createEntry(entry *model.Entry) error {
 	}
 
 	// Sync entry
-	syncEvent := gcppubsub.NewEntryEvent(entry.ID, gcppubsub.EntityOpWrite)
-	s.pub.PublishEvent(syncEvent)
+	// but we don't want to sync English article
+	langOptions := whatlanggo.Options {
+		Whitelist: map[whatlanggo.Lang]bool{
+			whatlanggo.Eng: true,
+			whatlanggo.Ind: true,
+		},
+	}
+	langInfo := whatlanggo.DetectWithOptions(entry.Content, langOptions)
 
+	if langInfo.Lang.String() == whatlanggo.Eng.String() {
+		logger.Debug("[Storage:createEntry] %s language detected, won't sync. [%s]", langInfo.Lang, entry.Title)
+	} else {
+		logger.Debug("[Storage:createEntry] %s language detected, will sync.[%s]", langInfo.Lang, entry.Title)
+		syncEvent := gcppubsub.NewEntryEvent(entry.ID, gcppubsub.EntityOpWrite)
+		s.pub.PublishEvent(syncEvent)
+	}
 	return nil
 }
 

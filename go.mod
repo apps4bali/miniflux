@@ -5,6 +5,7 @@ module miniflux.app
 require (
 	cloud.google.com/go v0.36.0
 	github.com/PuerkitoBio/goquery v1.5.0
+	github.com/abadojack/whatlanggo v1.0.1
 	github.com/gorilla/context v1.1.1 // indirect
 	github.com/gorilla/mux v1.6.2
 	github.com/lib/pq v1.0.0
