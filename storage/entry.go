@@ -9,13 +9,13 @@ import (
 	"fmt"
 	"time"
 
+	"miniflux.app/integration/gcppubsub"
 	"miniflux.app/logger"
 	"miniflux.app/model"
 	"miniflux.app/timer"
-	"miniflux.app/integration/gcppubsub"
 
-	"github.com/lib/pq"
 	"github.com/abadojack/whatlanggo"
+	"github.com/lib/pq"
 )
 
 // CountUnreadEntries returns the number of unread entries.
@@ -70,6 +70,14 @@ func (s *Storage) UpdateEntryContent(entry *model.Entry) error {
 
 // createEntry add a new entry.
 func (s *Storage) createEntry(entry *model.Entry) error {
+	// Gatra Bali Project:
+	// To avoid duplicate entry, check the title before creating new entry.
+	// not the best way but it should minimize dulicated entries on DB.
+	// Its fine to do this because feeds is managed by single user only.
+	if s.titleExists(entry.Title) {
+		return nil
+	}
+
 	query := `
 		INSERT INTO entries
 		(title, hash, url, comments_url, published_at, content, author, user_id, feed_id, document_vectors)
@@ -105,7 +113,7 @@ func (s *Storage) createEntry(entry *model.Entry) error {
 
 	// Sync entry
 	// but we don't want to sync English article
-	langOptions := whatlanggo.Options {
+	langOptions := whatlanggo.Options{
 		Whitelist: map[whatlanggo.Lang]bool{
 			whatlanggo.Eng: true,
 			whatlanggo.Ind: true,
@@ -167,6 +175,14 @@ func (s *Storage) entryExists(entry *model.Entry) bool {
 	var result int
 	query := `SELECT count(*) as c FROM entries WHERE user_id=$1 AND feed_id=$2 AND hash=$3`
 	s.db.QueryRow(query, entry.UserID, entry.FeedID, entry.Hash).Scan(&result)
+	return result >= 1
+}
+
+// titleExists checks if title already exists.
+func (s *Storage) titleExists(title string) bool {
+	var result int
+	query := `SELECT count(*) as c FROM entries WHERE title=$1`
+	s.db.QueryRow(query, title).Scan(&result)
 	return result >= 1
 }
 
