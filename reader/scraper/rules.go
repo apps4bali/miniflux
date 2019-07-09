@@ -41,8 +41,8 @@ var predefinedRules = map[string]string{
 	"zdnet.com":           "div.storyBody",
 
 	// Bali News Websites
-	"balipost.com":				 "div.td-post-content",
-	"nusabali.com": 			 ".entry-box .entry-content",
-	"metrobali.com":			 "figure.wp-single-image, .entry-content-inner",
-	"balipuspanews.com":		 ".td-post-featured-image img, .td-post-content",
+	"balipost.com":      "div.td-post-content",
+	"nusabali.com":      ".entry-box .entry-content",
+	"metrobali.com":     ".entry-content-inner",
+	"balipuspanews.com": ".td-post-content",
 }

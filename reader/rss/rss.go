@@ -11,6 +11,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/PuerkitoBio/goquery"
+
 	"miniflux.app/crypto"
 	"miniflux.app/logger"
 	"miniflux.app/model"
@@ -70,6 +72,8 @@ type rssItem struct {
 	Creator           string           `xml:"http://purl.org/dc/elements/1.1/ creator"`
 	EnclosureLinks    []rssEnclosure   `xml:"enclosure"`
 	OrigEnclosureLink string           `xml:"http://rssnamespace.org/feedburner/ext/1.0 origEnclosureLink"`
+	Image             string           `xml:"image"`
+	Thumbnail         string           `xml:"thumbnail"`
 }
 
 func (r *rssFeed) SiteURL() string {
@@ -219,6 +223,39 @@ func (r *rssItem) Enclosures() model.EnclosureList {
 		})
 	}
 
+	// If enclosures empty, try check for 'image', 'thumbnail' or content first image
+	if len(enclosures) == 0 {
+		if r.Image != "" {
+			enclosures = append(enclosures, &model.Enclosure{
+				URL:      r.Image,
+				MimeType: "image/jpg",
+				Size:     0,
+			})
+		} else if r.Thumbnail != "" {
+			enclosures = append(enclosures, &model.Enclosure{
+				URL:      r.Thumbnail,
+				MimeType: "image/jpg",
+				Size:     0,
+			})
+		} else {
+			// read the content to get images
+			doc, err := goquery.NewDocumentFromReader(strings.NewReader(r.Content()))
+			if err != nil {
+				return enclosures
+			}
+			matches := doc.Find("img[src]")
+			if matches.Length() > 0 {
+				matches.Each(func(i int, img *goquery.Selection) {
+					src, _ := img.Attr("src")
+					enclosures = append(enclosures, &model.Enclosure{
+						URL:      src,
+						MimeType: "image/jpg",
+						Size:     0,
+					})
+				})
+			}
+		}
+	}
 	return enclosures
 }
 
