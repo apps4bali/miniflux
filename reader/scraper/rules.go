@@ -43,6 +43,6 @@ var predefinedRules = map[string]string{
 	// Bali News Websites
 	"balipost.com":      "div.td-post-content",
 	"nusabali.com":      ".entry-box .entry-content",
-	"metrobali.com":     ".entry-content-inner",
+	"metrobali.com":     ".post-image img.wp-post-image, .entry-content-inner",
 	"balipuspanews.com": ".td-post-content",
 }

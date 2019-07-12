@@ -145,7 +145,7 @@ func hideFirstImage(entryURL, entryContent string) string {
 		// we only need to hide the first image
 		img := matches.First()
 		srcAttr, _ := img.Attr("src")
-		img.ReplaceWithHtml(`<span data-miniflux-enclosure="`+ srcAttr +`"/>`)
+		img.ReplaceWithHtml(`<span data-miniflux-enclosure="` + srcAttr + `"/>`)
 
 		output, _ := doc.Find("body").First().Html() // the whole output
 		return output
@@ -186,7 +186,7 @@ func cleanupBaliPost(entryURL, entryContent string) string {
 			changed = true
 		}
 	})
-	
+
 	if changed {
 		output, _ := doc.Find("body").First().Html()
 		return output
@@ -210,13 +210,13 @@ func cleanupMetroBali(entryURL, entryContent string) string {
 			changed = true
 		}
 	})
-	
+
 	// Remove Related Posts
 	relatedPostSectionHeader := doc.Find("h3")
 	relatedPostSectionHeader.Each(func(i int, h3 *goquery.Selection) {
 		if h3.Text() == "Related Posts" {
 
-			// remove all elements after '<h3>Related Posts</h3>' 
+			// remove all elements after '<h3>Related Posts</h3>'
 			nexts := h3.NextAll()
 			nexts.Each(func(i int, next *goquery.Selection) {
 				next.Remove()
@@ -226,6 +226,13 @@ func cleanupMetroBali(entryURL, entryContent string) string {
 			h3.Remove()
 			changed = true
 		}
+	})
+
+	// Remove Ad Links
+	ad := doc.Find(".advertising_content_single")
+	ad.Each(func(i int, ad *goquery.Selection) {
+		ad.Remove()
+		changed = true
 	})
 
 	if changed {
@@ -249,7 +256,7 @@ func cleanupBaliPuspaNews(entryURL, entryContent string) string {
 		ad.Remove()
 		changed = true
 	})
-	
+
 	if changed {
 		output, _ := doc.Find("body").First().Html()
 		return output
