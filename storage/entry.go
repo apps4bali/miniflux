@@ -164,8 +164,8 @@ func (s *Storage) updateEntry(entry *model.Entry) error {
 	}
 
 	// Sync entry
-	syncEvent := gcppubsub.NewEntryEvent(entry.ID, gcppubsub.EntityOpWrite)
-	s.pub.PublishEvent(syncEvent)
+	// syncEvent := gcppubsub.NewEntryEvent(entry.ID, gcppubsub.EntityOpWrite)
+	// s.pub.PublishEvent(syncEvent)
 
 	return s.UpdateEnclosures(entry.Enclosures)
 }
